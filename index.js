@@ -2,19 +2,15 @@ const functions = require("@google-cloud/functions-framework");
 const jwt = require("jsonwebtoken");
 const Mailgun = require("mailgun.js");
 const formData = require("form-data");
+const { insertToken } = require("./database.js");
 
-functions.cloudEvent("helloPubSub", (cloudEvent) => {
+functions.cloudEvent("helloPubSub", async (cloudEvent) => {
   const base64name = cloudEvent.data.message.data;
-
   const user = JSON.parse(Buffer.from(base64name, "base64").toString());
 
-  const token = jwt.sign(
-    { email: user.email },
-    process.env.JWT_SECRET_KEY,
-    { expiresIn: "2m" }
-  );
-
-  const verificationLink = `${process.env.ROOT_URL}/verify/${token}`;
+  await insertToken(user);
+  
+  const verificationLink = `${process.env.ROOT_URL}/verify/${user.token}`;
 
   const mailgun = new Mailgun(formData);
   const mg = mailgun.client({
@@ -26,11 +22,14 @@ functions.cloudEvent("helloPubSub", (cloudEvent) => {
     .create("mail.jaygala25.me", {
       from: `jaygala25 <no-reply@mail.jaygala25.me>`,
       to: user.email,
-      subject: "Verify your email address",
+      subject: "Please Verify Your Email Address",
       text:
-        `Hi ${user.first_name} ${user.last_name}!\n\n
-        Please click the link below to verify your email address:\n
-        ${verificationLink}`
+        `Hello ${user.first_name} ${user.last_name}!\n\n` +
+        `Welcome to our website! We're excited to have you here.\n\n` +
+        `Thank you for registering at our website. Please click on the following link to verify your email address:${verificationLink}\n\n` +
+        `If you did not request this, please ignore this email.\n\n` +
+        `Best regards,\n` +
+        `Jay Gala`,
     })
     .then((msg) => console.log(msg))
     .catch((err) => console.log(err));
