@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "zip -r cloud-function.zip . -x 'node_modules/*' -x '.git/*' -x '.github/*'"
+    "build": "zip -r cloud-function.zip . -x 'node_modules/*' -x '.git/*' -x '.github/*' -x 'package-lock.json'"
   },
   "keywords": [],
   "author": "",
