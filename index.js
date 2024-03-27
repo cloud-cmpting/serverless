@@ -7,8 +7,6 @@ const { insertToken } = require("./database.js");
 functions.cloudEvent("helloPubSub", async (cloudEvent) => {
   const base64name = cloudEvent.data.message.data;
   const user = JSON.parse(Buffer.from(base64name, "base64").toString());
-
-  await insertToken(user);
   
   const verificationLink = `${process.env.ROOT_URL}/verify/${user.token}`;
 
@@ -17,6 +15,8 @@ functions.cloudEvent("helloPubSub", async (cloudEvent) => {
     username: "api",
     key: process.env.MAILGUN_API_KEY,
   });
+
+  await insertToken(user);
 
   mg.messages
     .create("mail.jaygala25.me", {
