@@ -2,7 +2,7 @@ const functions = require("@google-cloud/functions-framework");
 const jwt = require("jsonwebtoken");
 const Mailgun = require("mailgun.js");
 const formData = require("form-data");
-const { insertToken } = require("./database.js");
+const insertToken = require("./database.js");
 
 functions.cloudEvent("helloPubSub", async (cloudEvent) => {
   const base64name = cloudEvent.data.message.data;
